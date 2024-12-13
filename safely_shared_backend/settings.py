@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import os
+# from azure.identity import DefaultAzureCredential
+# from azure.keyvault.secrets import SecretClient
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -39,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'files', 
+    'corsheaders'
 ]
 
 MIDDLEWARE = [
@@ -49,9 +52,14 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'safely_shared_backend.urls'
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",  # Add your React app's URL
+]
 
 TEMPLATES = [
     {
@@ -125,3 +133,12 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# KEY_VAULT_NAME = os.getenv('KEY_VAULT_NAME')
+# KEY_VAULT_URL = f"https://{KEY_VAULT_NAME}.vault.azure.net/"
+# credential = DefaultAzureCredential()
+# secret_client = SecretClient(vault_url=KEY_VAULT_URL, credential=credential)
+
+# # Retrieve the AES-256 key from Azure Key Vault
+# AES_KEY_NAME = os.getenv('AES_KEY_NAME')
+# aes_key = secret_client.get_secret(AES_KEY_NAME).value
