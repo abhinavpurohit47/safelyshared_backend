@@ -57,10 +57,20 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'safely_shared_backend.urls'
 
+CORS_ALLOW_ALL_ORIGINS = False
+
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",  # Add your React app's URL
+    'http://localhost:5173',
 ]
 
+CORS_ALLOW_CREDENTIALS = True
+
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:5173',
+]
+
+# Ensure CSRF_COOKIE_HTTPONLY is set to False to allow JavaScript to access the CSRF token
+CSRF_COOKIE_HTTPONLY = False
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',

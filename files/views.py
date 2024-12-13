@@ -2,6 +2,7 @@ from django.http import HttpResponse
 from rest_framework import generics
 from .models import SharedFile
 from .serializers import SharedFileSerializer
+from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from .forms import UploadFileForm
 from .models import UploadedFile
@@ -37,20 +38,16 @@ def upload_file(request):
         if form.is_valid():
             uploaded_file = request.FILES['file']
             file_content = uploaded_file.read()
-            print("File content read successfully")
             aes_key = get_aes_key()
-            print("AES key retrieved successfully")
             encrypted_content = encrypt_file_content(file_content, aes_key)
-            print("File content encrypted successfully")
             UploadedFile.objects.create(
                 file_name=uploaded_file.name,
                 encrypted_content=encrypted_content
             )
-            print("File saved to database successfully")
-            return redirect('file_upload_success')
-    else:
-        form = UploadFileForm()
-    return render(request, 'files/upload.html', {'form': form})
+            return JsonResponse({'message': 'File uploaded successfully'})
+        else:
+            return JsonResponse({'error': 'Invalid form'}, status=400)
+    return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 
 def file_upload_success(request):
