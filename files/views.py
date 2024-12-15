@@ -3,7 +3,7 @@ import mimetypes
 from urllib.parse import urlencode
 from django.http import Http404, HttpResponse
 from rest_framework import generics
-from .models import SharedFile, CustomUser
+from .models import SharedFile
 from .serializers import SharedFileSerializer
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
@@ -80,6 +80,8 @@ def download_file_signed(request):
     response = HttpResponse(decrypted_content, content_type=mime_type or 'application/octet-stream')
     response['Content-Disposition'] = f'attachment; filename="{uploaded_file.file_name}"'
     return response
+
+
 def list_uploaded_files(request):
     files = UploadedFile.objects.all().values('id', 'file_name', 'uploaded_at')
     return JsonResponse(list(files), safe=False)
