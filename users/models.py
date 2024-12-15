@@ -8,3 +8,6 @@ class CustomUser(AbstractUser):
         ('guest', 'Guest'),
     )
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='guest')
+    first_name = models.CharField(max_length=150, blank=True)
+    last_name = models.CharField(max_length=150, blank=True)
+    email = models.EmailField(blank=True)
