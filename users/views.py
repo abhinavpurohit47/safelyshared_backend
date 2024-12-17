@@ -39,7 +39,7 @@ def is_guest(user):
 def list_users(request):
     users = CustomUser.objects.all()
     serializer = CustomUserSerializer(users, many=True)
-    return Response(serializer.data)
+    return JsonResponse(serializer.data, safe=False)
 
 @api_view(['GET'])
 def get_user(request, user_id):
@@ -74,7 +74,7 @@ def register(request):
             login(request, user)
             return JsonResponse({'message': 'User registered successfully'}, status=201)
         else:
-            print(form.errors, 'FORM ERRORS')  # Print form errors
+            print(form.errors, 'FORM ERRORS')
             return JsonResponse({'errors': form.errors}, status=400)
     return JsonResponse({'error': 'Invalid request method'}, status=405)
 
@@ -98,6 +98,6 @@ def update_user(request, user_id):
             user = form.save()
             return JsonResponse({'message': 'User updated successfully'}, status=200)
         else:
-            print(form.errors, 'FORM ERRORS')  # Print form errors
+            print(form.errors, 'FORM ERRORS')
             return JsonResponse({'errors': form.errors}, status=400)
     return JsonResponse({'error': 'Invalid request method'}, status=405)

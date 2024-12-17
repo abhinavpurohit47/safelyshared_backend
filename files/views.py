@@ -3,7 +3,7 @@ import mimetypes
 from urllib.parse import urlencode
 from django.http import Http404, HttpResponse
 from rest_framework import generics
-from .models import SharedFile
+from .models import EncryptionKey, SharedFile
 from .serializers import SharedFileSerializer
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
@@ -11,6 +11,7 @@ from .forms import UploadFileForm
 from .models import UploadedFile
 from django.core.signing import Signer, TimestampSigner, BadSignature, SignatureExpired
 from django.conf import settings
+from django.views.decorators.http import require_GET
 from django.urls import reverse
 from .encryption import encrypt_file_content, decrypt_file_content, get_aes_key
 class FileUploadView(generics.CreateAPIView):
@@ -50,9 +51,11 @@ def download_file(request, file_id):
 
     aes_key = get_aes_key()
     decrypted_content = decrypt_file_content(uploaded_file.encrypted_content, aes_key)
-    encoded_content = base64.b64encode(decrypted_content).decode('utf-8')
+    mime_type, _ = mimetypes.guess_type(uploaded_file.file_name)
+    response = HttpResponse(decrypted_content, content_type=mime_type or 'application/octet-stream')
+    response['Content-Disposition'] = f'attachment; filename="{uploaded_file.file_name}"'
+    return response
 
-    return JsonResponse({'file_name': uploaded_file.file_name, 'content': encoded_content})
 
 def generate_download_link(request, file_id):
     try:
@@ -81,7 +84,6 @@ def download_file_signed(request):
     response['Content-Disposition'] = f'attachment; filename="{uploaded_file.file_name}"'
     return response
 
-
 def list_uploaded_files(request):
     files = UploadedFile.objects.all().values('id', 'file_name', 'uploaded_at')
     return JsonResponse(list(files), safe=False)
@@ -102,3 +104,12 @@ def list_uploaded_files(request):
 
 def file_upload_success(request):
     return HttpResponse("File uploaded successfully!")
+
+def get_encryption_key(request):
+    try:
+        encryption_key = EncryptionKey.objects.get(key_name='aes_key')
+        key_value = encryption_key.key_value.hex()
+        print(key_value, "KEYYY")
+        return JsonResponse({'key': key_value})
+    except EncryptionKey.DoesNotExist:
+        return JsonResponse({'error': 'Encryption key not found'}, status=404)

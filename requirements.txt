@@ -1,0 +1,8 @@
+Django
+djangorestframework
+cryptography
+PyJWT                 
+django-cors-headers            
+pycryptodome
+django-otp
+fastapi
