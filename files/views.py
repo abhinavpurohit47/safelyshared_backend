@@ -42,7 +42,15 @@ def upload_file(request):
             return JsonResponse({'error': 'Invalid form data'}, status=400)
     return JsonResponse({'error': 'Invalid request method'}, status=405)
 
-
+def get_aes_view(request):
+    try:
+        key = get_aes_key()
+        key_hex = key.hex()
+        print(key_hex, 'KEY54')
+        return JsonResponse({'key': key_hex})
+    except EncryptionKey.DoesNotExist:
+        return JsonResponse({'error': 'Encryption key not found'}, status=404)
+    
 def download_file(request, file_id):
     try:
         uploaded_file = UploadedFile.objects.get(id=file_id)
@@ -105,11 +113,10 @@ def list_uploaded_files(request):
 def file_upload_success(request):
     return HttpResponse("File uploaded successfully!")
 
-def get_encryption_key(request):
+def get_encryption_key():
     try:
-        encryption_key = EncryptionKey.objects.get(key_name='aes_key')
-        key_value = encryption_key.key_value.hex()
-        print(key_value, "KEYYY")
-        return JsonResponse({'key': key_value})
+        key = EncryptionKey.objects.get(key_name='aes_key').key_value
+        print(key, 'KEY')
+        return JsonResponse({'key': key.hex()})
     except EncryptionKey.DoesNotExist:
         return JsonResponse({'error': 'Encryption key not found'}, status=404)

@@ -4,6 +4,7 @@ from cryptography.hazmat.backends import default_backend
 import base64
 from files.models import EncryptionKey
 import os
+
 def get_aes_key():
     try:
         key = EncryptionKey.objects.get(key_name='aes_key').key_value
