@@ -1,7 +1,7 @@
 from rest_framework import serializers
-from .models import SharedFile
+from .models import UploadedFile
 
-class SharedFileSerializer(serializers.ModelSerializer):
+class UploadedFileSerializer(serializers.ModelSerializer):
     class Meta:
-        model = SharedFile
-        fields = ['id', 'file', 'uploaded_at', 'description']
+        model = UploadedFile
+        fields = ['file_name', 'encrypted_content', 'iv', 'uploaded_at']

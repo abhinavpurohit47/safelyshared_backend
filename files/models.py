@@ -8,9 +8,10 @@ class SharedFile(models.Model):
 
 class UploadedFile(models.Model):
     file_name = models.CharField(max_length=255)
-    encrypted_content = models.TextField(default='')
+    encrypted_content = models.BinaryField()
+    iv = models.BinaryField()
     uploaded_at = models.DateTimeField(auto_now_add=True)
-    iv= models.BinaryField()
+    
 class EncryptionKey(models.Model):
     key_name = models.CharField(max_length=255, unique=True)
     key_value = models.BinaryField()
