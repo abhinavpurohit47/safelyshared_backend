@@ -4,7 +4,7 @@ from urllib.parse import urlencode
 from django.http import Http404, HttpResponse
 from rest_framework import generics
 from .models import EncryptionKey, SharedFile
-# from .serializers import SharedFileSerializer
+
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from .forms import UploadFileForm
@@ -16,13 +16,6 @@ from django.urls import reverse
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .encryption import encrypt_file_content, decrypt_file_content, get_aes_key
-# class FileUploadView(generics.CreateAPIView):
-#     queryset = SharedFile.objects.all()
-#     serializer_class = SharedFileSerializer
-
-# class FileListView(generics.ListAPIView):
-#     queryset = SharedFile.objects.all()
-#     serializer_class = SharedFileSerializer
 class FileUploadView(APIView):
     def post(self, request, *args, **kwargs):
         file_name = request.data.get('file_name')
@@ -108,18 +101,17 @@ def download_file_signed(request):
         raise Http404("File does not exist")
 
     aes_key = get_aes_key()
-    iv = uploaded_file.iv[:16]  # Ensure the IV is a string or bytes
-    print(iv, 'IV')  # Debugging print statement
+    iv = uploaded_file.iv[:16] 
+    print(iv, 'IV')
 
     if isinstance(iv, str):
-        iv = bytes.fromhex(iv)  # Convert hex string to bytes
+        iv = bytes.fromhex(iv) 
     elif isinstance(iv, bytes):
-        iv = iv[:16]  # Ensure the IV is 16 bytes long
+        iv = iv[:16]
 
     if len(iv) != 16:
         return HttpResponse('Incorrect IV length', status=400)
 
-    # decrypted_content = decrypt_file_content(uploaded_file.encrypted_content, aes_key, iv)
     response_data = {
         'iv': iv.hex(),
         'encrypted_content': uploaded_file.encrypted_content.hex(),
